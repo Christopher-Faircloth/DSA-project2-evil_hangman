@@ -81,14 +81,12 @@ class WordMakerAI():
         with open(words_file) as file_obj:
             for line in file_obj:
                 word = line.strip()
-
                 if len(word) not in self.word_dict:
-                    self.word_dict[len(word)] = ["word"]
-                else:
-                    if word in self.word_dict[len(word)]:
-                        pass
-                    else:
-                        self.word_dict[len(word)].append(word)
+                    self.word_dict[len(word)] = []
+                if word not in self.word_dict[len(word)]:
+                    self.word_dict[len(word)].append(word)
+
+
         for length in self.word_dict:
             self.word_dict[length] = sorted(self.word_dict[length])
 
