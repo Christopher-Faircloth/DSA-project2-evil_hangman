@@ -160,36 +160,18 @@ class WordMakerAI():
         # puts the valid words in different groups depending on
         # how many times the guessed letter is in it
         groupings = {}
-        # the groupings length helps for quick comparing to which group is the biggest
-        groupings_length = {}
+
         for word in self.valid_words:
             occurances = self.get_letter_positions_in_word(word, guess_letter)
             if occurances not in groupings:
                 groupings[occurances] = []
-                groupings_length[occurances] = 0
-
             groupings[occurances].append(word)
-            groupings_length[occurances] += 1
-        sorted_groupings = dict(sorted(
-                groupings_length.items(),
-                key = lambda item: item[1],
-                reverse = True
-                ))
-        max_key, max_size = next(iter(sorted_groupings.items()))
-        maxNum1s = len(max_key)
-        for key, size in sorted_groupings.items():
-            if max_key == key:
-                continue
-            if size < max_size:
-                self.valid_words = groupings[max_key]
-                return list(max_key)
-            else:
-                #check which has more "1s"
-                currNum1s = len(key)
-                if currNum1s < maxNum1s:
-                    max_key = key
-                    max_size = size
-                    maxNum1s = currNum1s
+        #find the max grouping based on key length (num occurances)
+        # and the number of words in the list
+        max_key = max(
+            groupings,
+            key=lambda key: (len(groupings[key]), -len(key))
+        )
 
         self.valid_words = groupings[max_key]
         return list(max_key)
