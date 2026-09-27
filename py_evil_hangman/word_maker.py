@@ -178,25 +178,21 @@ class WordMakerAI():
                 reverse = True
                 ))
         max_key, max_size = next(iter(sorted_groupings.items()))
-        maxNum1s = 0
-        for num in max_key:
-            maxNum1s += num
+        maxNum1s = len(max_key)
         for key, size in sorted_groupings.items():
             if max_key == key:
-                pass
+                continue
             if size < max_size:
                 self.valid_words = groupings[max_key]
-                return max_key
+                return list(max_key)
             else:
                 #check which has more "1s"
-                currNum1s = 0
-                for num in key:
-                    currNum1s += num
-                if currNum1s < max_size:
+                currNum1s = len(key)
+                if currNum1s < maxNum1s:
                     max_key = key
                     max_size = size
                     maxNum1s = currNum1s
 
         self.valid_words = groupings[max_key]
-        return max_key
+        return list(max_key)
         pass # TODO: implement this
