@@ -81,10 +81,11 @@ class WordMakerAI():
         with open(words_file) as file_obj:
             for line in file_obj:
                 word = line.strip()
+                if not word:
+                    continue
                 if len(word) not in self.word_dict:
-                    self.word_dict[len(word)] = []
-                if word not in self.word_dict[len(word)]:
-                    self.word_dict[len(word)].append(word)
+                    self.word_dict[len(word)] = set()
+                self.word_dict[len(word)].add(word)
 
 
         for length in self.word_dict:
