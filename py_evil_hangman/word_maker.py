@@ -75,27 +75,38 @@ class WordMakerAI():
         self.verbose = verbose
 
         # Use this code if you like.
-        """
+        self.word_dict = {}
+        self.valid_words = []
+        self.word_length = 0
         with open(words_file) as file_obj:
             for line in file_obj:
                 word = line.strip()
-                # Use word
-        """
 
-        pass # TODO: implement this
+                if len(word) not in self.word_dict:
+                    self.word_dict[len(word)] = ["word"]
+                else:
+                    if word in self.word_dict[len(word)]:
+                        pass
+                    else:
+                        self.word_dict[len(word)].append(word)
+        for length in self.word_dict:
+            self.word_dict[length] = sorted(self.word_dict[length])
 
     def reset(self, word_length: int) -> None:
         # This function starts a new game with a word length of `word_length`. This will always be called before guess() or get_valid_word() are called.
         # You should try to make this function should be O(1). That is, you shouldn't have to process over the entire dictionary here (find somewhere else to preprocess it)
         # Your AI code should not call input() or print().
 
-        pass # TODO: implement this
+        # creates valid words list, this takes all words from our word_dict with legnth word_length
+        self.valid_words = self.word_dict[word_length]
+
 
     def get_valid_word(self) -> str:
         # Get a valid word in the active dictionary, to return when you lose
         # Can return any word, as long as it satisfies the previous guesses
 
-        pass # TODO: implement this
+        #return first word in active words list
+        return self.valid_words[0]
 
     def get_amount_of_valid_words(self) -> int:
         # This function gets the total amount of possible words "remaining" (i.e., that satisfy all the guesses since self.reset was last called)
@@ -103,7 +114,7 @@ class WordMakerAI():
         # Note: This is used extensively in the autograder! Be sure to verify that this function works
         # via the provided test cases.
         # You can see this number by running with the verbose flag, i.e. `python3 evil_hangman.py --verbose`
-
+        return len(self.valid_words)
         pass # TODO: implement this
 
     def get_letter_positions_in_word(self, word: str, guess_letter: str) -> tuple[int, ...]:
@@ -114,6 +125,11 @@ class WordMakerAI():
 
         # Note: to convert from a list to a tuple, call tuple() on the list. For instance:
         result = []
+
+        for i, letter in enumerate(word):
+            if letter == guess_letter:
+                result.append(i)
+
         # TODO: add letter positions to result
         return tuple(result)
         
@@ -142,5 +158,45 @@ class WordMakerAI():
 
         # The order of the returned list should be sorted. You can assume that 'guess_letter' has not been seen yet since the last call to self.reset(),
         #  and that guess_letter has len of 1 and is a lowercase a-z letter.
-        
+
+        # puts the valid words in different groups depending on
+        # how many times the guessed letter is in it
+        groupings = {}
+        # the groupings length helps for quick comparing to which group is the biggest
+        groupings_length = {}
+        for word in self.valid_words:
+            occurances = self.get_letter_positions_in_word(word, guess_letter)
+            if occurances not in groupings:
+                groupings[occurances] = []
+                groupings_length[occurances] = 0
+
+            groupings[occurances].append(word)
+            groupings_length[occurances] += 1
+        sorted_groupings = dict(sorted(
+                groupings_length.items(),
+                key = lambda item: item[1],
+                reverse = True
+                ))
+        max_key, max_size = next(iter(sorted_groupings.items()))
+        maxNum1s = 0
+        for num in max_key:
+            maxNum1s += num
+        for key, size in sorted_groupings.items():
+            if max_key == key:
+                pass
+            if size < max_size:
+                self.valid_words = groupings[max_key]
+                return max_key
+            else:
+                #check which has more "1s"
+                currNum1s = 0
+                for num in key:
+                    currNum1s += num
+                if currNum1s < max_size:
+                    max_key = key
+                    max_size = size
+                    maxNum1s = currNum1s
+
+        self.valid_words = groupings[max_key]
+        return max_key
         pass # TODO: implement this
